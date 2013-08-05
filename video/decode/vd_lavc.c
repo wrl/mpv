@@ -366,7 +366,7 @@ static void init_avctx(sh_video_t *sh, const char *decoder,
             return;
         }
     } else {
-#if HAVE_AVUTIL_REFCOUNTING
+#ifdef HAVE_LIBAVUTIL_REFCOUNTING
         avctx->refcounted_frames = 1;
 #else
         if (lavc_codec->capabilities & CODEC_CAP_DR1) {
@@ -451,7 +451,7 @@ static void uninit_avctx(sh_video_t *sh)
     if (ctx->hwdec && ctx->hwdec->uninit)
         ctx->hwdec->uninit(ctx);
 
-#if !HAVE_AVUTIL_REFCOUNTING
+#ifndef HAVE_LIBAVUTIL_REFCOUNTING
     mp_buffer_pool_free(&ctx->dr1_buffer_pool);
 #endif
 }
@@ -580,7 +580,7 @@ static struct mp_image *get_surface_hwdec(struct sh_video *sh, AVFrame *pic)
     return mpi;
 }
 
-#if HAVE_AVUTIL_REFCOUNTING
+#ifdef HAVE_LIBAVUTIL_REFCOUNTING
 
 static void free_mpi(void *opaque, uint8_t *data)
 {
@@ -607,7 +607,7 @@ static void setup_refcounting_hw(AVCodecContext *avctx)
     avctx->refcounted_frames = 1;
 }
 
-#else /* HAVE_AVUTIL_REFCOUNTING */
+#else /* HAVE_LIBAVUTIL_REFCOUNTING */
 
 static int get_buffer_hwdec(AVCodecContext *avctx, AVFrame *pic)
 {
@@ -648,9 +648,9 @@ static void setup_refcounting_hw(AVCodecContext *avctx)
     avctx->release_buffer = release_buffer_hwdec;
 }
 
-#endif /* HAVE_AVUTIL_REFCOUNTING */
+#endif /* HAVE_LIBAVUTIL_REFCOUNTING */
 
-#if HAVE_AVUTIL_REFCOUNTING
+#ifdef HAVE_LIBAVUTIL_REFCOUNTING
 
 static struct mp_image *image_from_decoder(struct sh_video *sh)
 {
@@ -663,7 +663,7 @@ static struct mp_image *image_from_decoder(struct sh_video *sh)
     return img;
 }
 
-#else /* HAVE_AVUTIL_REFCOUNTING */
+#else /* HAVE_LIBAVUTIL_REFCOUNTING */
 
 static void fb_ref(void *b)
 {
@@ -705,7 +705,7 @@ static struct mp_image *image_from_decoder(struct sh_video *sh)
     return mpi;
 }
 
-#endif /* HAVE_AVUTIL_REFCOUNTING */
+#endif /* HAVE_LIBAVUTIL_REFCOUNTING */
 
 static int decode(struct sh_video *sh, struct demux_packet *packet,
                   int flags, double *reordered_pts, struct mp_image **out_image)
