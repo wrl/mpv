@@ -100,7 +100,7 @@ static const stream_info_t *const stream_list[] = {
 #ifdef CONFIG_PVR
     &stream_info_pvr,
 #endif
-#ifdef CONFIG_LIBSMBCLIENT
+#ifdef HAVE_LIBSMBCLIENT
     &stream_info_smb,
 #endif
 #ifdef CONFIG_DVDREAD
