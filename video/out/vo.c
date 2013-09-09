@@ -72,7 +72,7 @@ const struct vo_driver *video_out_drivers[] =
 #ifdef HAVE_OPENGL
         &video_out_opengl,
 #endif
-#ifdef CONFIG_DIRECT3D
+#ifdef HAVE_DIRECT3D
         &video_out_direct3d_shaders,
         &video_out_direct3d,
 #endif

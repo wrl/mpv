@@ -30,11 +30,9 @@ int main(void) {
     CoUninitialize();
 }
     ])
-    AM_COND_IF([HAVE_WASAPI],[AC_DEFINE([CONFIG_WASAPI],[1],[Define to 1 if WASAPI is enabled (compat with old build system)])])
 
     dnl ao_dsound uses LoadLibrary to load symbols, only needs the header
     AX_CHECK_STATEMENT([DSOUND],[DirectSound],[dsound.h])
-    AM_COND_IF([HAVE_DSOUND],[AC_DEFINE([CONFIG_DSOUND],[1],[Define to 1 if DirectSound is enabled (compat)])])
 
     AX_CC_CHECK_LIBS(["-lopengl32 -lgdi32"],[OPENGL],[OpenGL],[
 #include <windows.h>
@@ -50,9 +48,7 @@ int main(void) {
     ])
 
     dnl vo_direct3d uses LoadLibrary to load symbols, only needs the header
-    AX_CHECK_STATEMENT([DIRECT3D],[Direct3D 9],[d3d9.h])\
-    AM_COND_IF([HAVE_DIRECT3D],
-      [AC_DEFINE([CONFIG_DIRECT3D],[1],[Define to 1 if Direct3D 9 is enabled (compat)])])
+    AX_CHECK_STATEMENT([DIRECT3D],[Direct3D 9],[d3d9.h])
   ])
 
   AM_CONDITIONAL([HAVE_WASAPI],[test "x$have_wasapi" = "xyes"])
