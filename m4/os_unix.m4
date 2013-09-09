@@ -40,6 +40,8 @@ AC_DEFUN([OS_UNIX_CHECKS],[
 
     AX_PKG_ADD([X11],[x11])
 
+    AX_PKG_ADD([XEXT],[xext])
+
     AX_PKG_ADD([GL], [gl], [build with X11 OpenGL support])
     AM_COND_IF([HAVE_GL], [
       AC_DEFINE([HAVE_OPENGL_X11],[1],[Define to 1 when building with X11 OpenGL support])
