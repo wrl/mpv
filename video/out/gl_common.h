@@ -37,7 +37,7 @@
 
 #include "video/mp_image.h"
 
-#if defined(HAVE_OPENGL_COCOA) && !defined(CONFIG_GL_X11)
+#if defined(HAVE_OPENGL_COCOA) && !defined(HAVE_OPENGL_X11)
 #ifdef GL_VERSION_3_0
 #include <OpenGL/gl3.h>
 #else
