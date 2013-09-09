@@ -46,10 +46,20 @@ AC_DEFUN([OS_UNIX_CHECKS],[
     ])
 
     AX_PKG_ADD([XV],[xv])
+
+    AX_PKG_ADD([WAYLAND], [wayland-client >= 1.2.0 wayland-cursor xkbcommon >= 0.3.0])
+    AM_COND_IF([HAVE_GL], [
+        AX_PKG_ADD([WAYLAND_OPENGL], [wayland-egl >= 9.0.0 egl >= 9.0.0])
+      AC_DEFINE([HAVE_OPENGL_WAYLAND],[1],[Define to 1 when building with X11 OpenGL support])
+    ])
+
   ])
   AM_CONDITIONAL([HAVE_OSS_AUDIO], [test "x$have_oss" = "xyes"])
   AM_CONDITIONAL([HAVE_X11],       [test "x$with_x11" = "xyes"])
   AM_CONDITIONAL([HAVE_OPENGL_X11],[test "x$with_gl"  = "xyes"])
   AM_CONDITIONAL([HAVE_XV],        [test "x$with_xv"  = "xyes"])
+  AM_CONDITIONAL([HAVE_WAYLAND],   [test "x$with_wayland" = "xyes"])
+  AM_CONDITIONAL([HAVE_OPENGL_WAYLAND], [test "x$with_gl" = "xyes"])
   AM_COND_IF([HAVE_OPENGL_X11],[AM_CONDITIONAL([HAVE_OPENGL],[true])])
+  AM_COND_IF([HAVE_OPENGL_WAYLAND],[AM_CONDITIONAL([HAVE_OPENGL],[true])])
 ])

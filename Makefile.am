@@ -233,6 +233,14 @@ if HAVE_XV
   mpv_SOURCES += video/out/vo_xv.c
 endif
 
+if HAVE_WAYLAND
+  mpv_SOURCES += video/out/wayland_common.c
+#  mpv_SOURCES += video/out/vo_wayland.c
+if HAVE_OPENGL_WAYLAND
+  mpv_SOURCES += video/out/gl_wayland.c
+endif
+endif
+
 if HAVE_OPENGL
   mpv_SOURCES += video/out/gl_common.c video/out/gl_osd.c \
                  video/out/vo_opengl.c video/out/gl_lcms.c \

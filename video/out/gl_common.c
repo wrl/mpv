@@ -860,7 +860,7 @@ static struct backend backends[] = {
 #ifdef HAVE_OPENGL_X11
     {"x11", mpgl_set_backend_x11},
 #endif
-#ifdef CONFIG_GL_WAYLAND
+#ifdef HAVE_OPENGL_WAYLAND
     {"wayland", mpgl_set_backend_wayland},
 #endif
     {0}
