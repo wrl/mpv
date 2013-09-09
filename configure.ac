@@ -147,11 +147,6 @@ AX_CHECK_STATEMENT(
   [int x = AV_PIX_FMT_VDPAU])
 
 AX_CHECK_STATEMENT(
-  [LIBAVCODEC_PROP_TEXT_SUB], [libavcodec AV_CODEC_PROP_TEXT_SUB API],
-  [libavcodec/avcodec.h],
-  [int x = AV_CODEC_PROP_TEXT_SUB])
-
-AX_CHECK_STATEMENT(
   [LIBAVCODEC_CHROMA_POS_API], [libavcodec enum_to_chroma_pos API],
   [libavcodec/avcodec.h],
   [int x, y; avcodec_enum_to_chroma_pos(&x, &y, AVCHROMA_LOC_UNSPECIFIED)])

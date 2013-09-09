@@ -47,6 +47,7 @@ mpv_SOURCES = \
     demux/demux_lavf.c \
     demux/demux_mf.c \
     demux/demux_mkv.c \
+    demux/demux_playlist.c \
     demux/demux_subreader.c \
     demux/demux_raw.c \
     demux/ebml.c \
@@ -85,6 +86,7 @@ mpv_SOURCES = \
     osdep/timer.c \
     osdep/@osdep_timer@.c \
     stream/cookies.c \
+    stream/rar.c \
     stream/stream.c \
     stream/stream_avdevice.c \
     stream/stream_file.c \
@@ -92,6 +94,7 @@ mpv_SOURCES = \
     stream/stream_memory.c \
     stream/stream_mf.c \
     stream/stream_null.c \
+    stream/stream_rar.c \
     sub/dec_sub.c \
     sub/draw_bmp.c \
     sub/find_subfiles.c \
