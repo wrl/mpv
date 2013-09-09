@@ -857,7 +857,7 @@ static struct backend backends[] = {
 #ifdef CONFIG_GL_WIN32
     {"win", mpgl_set_backend_w32},
 #endif
-#ifdef CONFIG_GL_X11
+#ifdef HAVE_OPENGL_X11
     {"x11", mpgl_set_backend_x11},
 #endif
 #ifdef CONFIG_GL_WAYLAND

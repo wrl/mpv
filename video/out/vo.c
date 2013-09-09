@@ -79,7 +79,7 @@ const struct vo_driver *video_out_drivers[] =
 #ifdef HAVE_COREVIDEO
         &video_out_corevideo,
 #endif
-#ifdef CONFIG_XV
+#ifdef HAVE_XV
         &video_out_xv,
 #endif
 #ifdef CONFIG_SDL2
@@ -91,7 +91,7 @@ const struct vo_driver *video_out_drivers[] =
 #if CONFIG_VAAPI
         &video_out_vaapi,
 #endif
-#ifdef CONFIG_X11
+#ifdef HAVE_X11
         &video_out_x11,
 #endif
         &video_out_null,

@@ -84,7 +84,7 @@
 #include "sub/sub.h"
 #include "mpvcore/cpudetect.h"
 
-#ifdef CONFIG_X11
+#ifdef HAVE_X11
 #include "video/out/x11_common.h"
 #endif
 
@@ -4667,7 +4667,7 @@ static bool handle_help_options(struct MPContext *mpctx)
         talloc_free(list);
         opt_exit = 1;
     }
-#ifdef CONFIG_X11
+#ifdef HAVE_X11
     if (opts->vo.fstype_list && strcmp(opts->vo.fstype_list[0], "help") == 0) {
         fstype_help();
         mp_msg(MSGT_FIXME, MSGL_FIXME, "\n");

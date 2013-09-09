@@ -217,6 +217,22 @@ if OS_WINDOWS
   mpv_SOURCES += video/out/w32_common.c
 endif
 
+if HAVE_X11
+  mpv_SOURCES += video/out/x11_common.c video/out/vo_x11.c
+else
+if HAVE_OPENGL_X11
+  mpv_SOURCES += video/out/x11_common.c
+else
+if HAVE_XV
+  mpv_SOURCES += video/out/x11_common.c
+endif
+endif
+endif
+
+if HAVE_XV
+  mpv_SOURCES += video/out/vo_xv.c
+endif
+
 if HAVE_OPENGL
   mpv_SOURCES += video/out/gl_common.c video/out/gl_osd.c \
                  video/out/vo_opengl.c video/out/gl_lcms.c \
@@ -227,14 +243,18 @@ if HAVE_OPENGL
 if OS_WINDOWS
   mpv_SOURCES += video/out/gl_w32.c
 endif
-endif
 
-if HAVE_DIRECT3D
-  mpv_SOURCES += video/out/vo_direct3d.c
+if HAVE_OPENGL_X11
+  mpv_SOURCES += video/out/gl_x11.c
 endif
 
 if HAVE_OPENGL_COCOA
   mpv_SOURCES += video/out/gl_cocoa.c
+endif
+endif
+
+if HAVE_DIRECT3D
+  mpv_SOURCES += video/out/vo_direct3d.c
 endif
 
 if HAVE_COCOA
@@ -250,6 +270,10 @@ if HAVE_COREAUDIO
   mpv_SOURCES += audio/out/ao_coreaudio.c \
                  audio/out/ao_coreaudio_utils.c \
                  audio/out/ao_coreaudio_properties.c
+endif
+
+if HAVE_OSS_AUDIO
+  mpv_SOURCES += audio/out/ao_oss.c
 endif
 
 if CONFIG_ENCODING

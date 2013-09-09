@@ -57,8 +57,5 @@ int main(void) {
 
   AM_CONDITIONAL([HAVE_OPENGL],[test "x$have_opengl" = "xyes"])
   AM_COND_IF([HAVE_OPENGL],[
-    AC_DEFINE([CONFIG_GL], [1], [Define 1 if OpenGL is enabled (compat)])
-    AC_DEFINE([CONFIG_GL_WIN32], [1], [Define 1 if OpenGL on Win32 is enabled (compat)])
-    AC_DEFINE([HAVE_OPENGL], [1], [Define 1 if OpenGL is enabled])
     AC_DEFINE([HAVE_OPENGL_WIN32], [1], [Define 1 if OpenGL on Win32 is enabled])])
 ])

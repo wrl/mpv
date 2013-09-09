@@ -75,7 +75,6 @@ AX_CHECK_CONDITION([STREAM_CACHE], [stream cache],
 AX_ICONV
 # XXX: add gettext tests
 
-AC_CHECK_HEADERS([sys/soundcard.h soundcard.h], [break])
 AC_CHECK_HEADERS([sys/videoio.h])
 
 AX_CHECK_STATEMENT_LIBS(
@@ -234,6 +233,10 @@ AC_PROG_OBJC([clang])
 
 OS_DARWIN_CHECKS
 OS_WINDOWS_CHECKS
+dnl Do UNIX after the others (so it knows to avoid Darwin)
+OS_UNIX_CHECKS
+
+AM_COND_IF([HAVE_OPENGL],[AC_DEFINE([HAVE_OPENGL], [1], [Define 1 if OpenGL is enabled])])
 
 AC_MSG_CHECKING([whether encoding is enabled])
 AC_ARG_ENABLE([encoding],

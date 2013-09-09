@@ -52,7 +52,6 @@ AC_DEFUN([OS_DARWIN_CHECKS],[
   AM_CONDITIONAL([HAVE_COCOA],[test "x$have_cocoa" = "xyes"])
 
   AM_CONDITIONAL([HAVE_OPENGL],[test "x$have_opengl" = "xyes"])
-  AM_COND_IF([HAVE_OPENGL],[AC_DEFINE([HAVE_OPENGL], [1], [Define 1 if OpenGL is enabled])])
 
   AM_CONDITIONAL([HAVE_OPENGL_COCOA], [test "x$have_opengl_cocoa" = "xyes"])
   AM_COND_IF([HAVE_OPENGL_COCOA],[AC_DEFINE([HAVE_OPENGL_COCOA], [1], [Define 1 if OpenGL Cocoa backend is enabled])])

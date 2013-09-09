@@ -61,7 +61,7 @@ static const struct ao_driver * const audio_out_drivers[] = {
 #ifdef HAVE_WASAPI
     &audio_out_wasapi,
 #endif
-#ifdef CONFIG_OSS_AUDIO
+#ifdef HAVE_OSS_AUDIO
     &audio_out_oss,
 #endif
 #ifdef HAVE_DSOUND

@@ -610,7 +610,7 @@ const m_option_t mp_opts[] = {
     OPT_FLAG("stop-screensaver", stop_screensaver, 0),
 
     OPT_INT64("wid", vo.WinID, CONF_GLOBAL),
-#ifdef CONFIG_X11
+#ifdef HAVE_X11
     OPT_STRINGLIST("fstype", vo.fstype_list, 0),
 #endif
     OPT_STRING("heartbeat-cmd", heartbeat_cmd, 0),
