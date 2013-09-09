@@ -209,6 +209,14 @@ if HAVE_WASAPI
   mpv_SOURCES += audio/out/ao_wasapi.c
 endif
 
+if HAVE_DSOUND
+  mpv_SOURCES += audio/out/ao_dsound.c
+endif
+
+if OS_WINDOWS
+  mpv_SOURCES += video/out/w32_common.c
+endif
+
 if HAVE_OPENGL
   mpv_SOURCES += video/out/gl_common.c video/out/gl_osd.c \
                  video/out/vo_opengl.c video/out/gl_lcms.c \
@@ -217,8 +225,12 @@ if HAVE_OPENGL
                  video/out/pnm_loader.c
 
 if OS_WINDOWS
-  mpv_SOURCES += video/out/w32_common.c video/out/gl_w32.c
+  mpv_SOURCES += video/out/gl_w32.c
 endif
+endif
+
+if HAVE_DIRECT3D
+  mpv_SOURCES += video/out/vo_direct3d.c
 endif
 
 if HAVE_OPENGL_COCOA
