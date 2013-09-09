@@ -247,5 +247,7 @@ AM_COND_IF([CONFIG_ENCODING],[
   AC_DEFINE([CONFIG_ENCODING],[1],[Define to 1 if encoding is supported (compat)])])
 AC_MSG_RESULT([$enable_encoding])
 
+LIBS="$LIBS -lm"
+
 AC_CONFIG_MACRO_DIR([m4])
 AC_OUTPUT([Makefile])
