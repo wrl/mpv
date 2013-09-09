@@ -45,6 +45,8 @@ int main(void) {
     ])
   ])
 
+  AM_CONDITIONAL([HAVE_WASAPI],[test "x$have_wasapi" = "xyes"])
+
   AM_CONDITIONAL([HAVE_OPENGL],[test "x$have_opengl" = "xyes"])
   AM_COND_IF([HAVE_OPENGL],[
     AC_DEFINE([CONFIG_GL], [1], [Define 1 if OpenGL is enabled (compat)])
