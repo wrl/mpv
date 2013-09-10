@@ -106,7 +106,7 @@ const struct vo_driver *video_out_drivers[] =
 #ifdef HAVE_OPENGL
         &video_out_opengl_hq,
 #endif
-#ifdef CONFIG_WAYLAND
+#ifdef HAVE_WAYLAND
         &video_out_wayland,
 #endif
         NULL

@@ -238,7 +238,7 @@ endif
 
 if HAVE_WAYLAND
   mpv_SOURCES += video/out/wayland_common.c
-#  mpv_SOURCES += video/out/vo_wayland.c
+  mpv_SOURCES += video/out/vo_wayland.c
 if HAVE_OPENGL_WAYLAND
   mpv_SOURCES += video/out/gl_wayland.c
 endif
