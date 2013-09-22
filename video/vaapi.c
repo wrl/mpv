@@ -122,7 +122,8 @@ void va_destroy(struct mp_vaapi_ctx *ctx)
     }
 }
 
-VAImageFormat *va_image_format_from_imgfmt(const struct va_image_formats *formats, int imgfmt)
+VAImageFormat *va_image_format_from_imgfmt(const struct va_image_formats *formats,
+                                           int imgfmt)
 {
     const int fourcc = va_fourcc_from_imgfmt(imgfmt);
     if (!formats || !formats->num || !fourcc)
@@ -193,7 +194,8 @@ void va_surface_pool_clear(struct va_surface_pool *pool)
 
 struct va_surface *va_surface_in_mp_image(struct mp_image *mpi)
 {
-    return mpi && IMGFMT_IS_VAAPI(mpi->imgfmt) ? (struct va_surface*)(uintptr_t)mpi->planes[0] : NULL;
+    return mpi && IMGFMT_IS_VAAPI(mpi->imgfmt) ?
+        (struct va_surface*)(uintptr_t)mpi->planes[0] : NULL;
 }
 
 void va_surface_destroy(struct va_surface *surface)
@@ -227,10 +229,12 @@ void va_surface_releasep(struct va_surface **surface)
     *surface = NULL;
 }
 
-static struct va_surface *va_surface_alloc(struct va_surface_pool *pool, int w, int h)
+static struct va_surface *va_surface_alloc(struct va_surface_pool *pool,
+                                           int w, int h)
 {
     VASurfaceID id = VA_INVALID_ID;
-    VAStatus status = vaCreateSurfaces(pool->display, w, h, pool->rt_format, 1, &id);
+    VAStatus status;
+    status = vaCreateSurfaces(pool->display, w, h, pool->rt_format, 1, &id);
     if (!check_va_status(status, "vaCreateSurfaces()"))
         return NULL;
 
@@ -249,9 +253,12 @@ static struct va_surface *va_surface_alloc(struct va_surface_pool *pool, int w, 
     return surface;
 }
 
-struct mp_image *va_surface_pool_get_wrapped(struct va_surface_pool *pool, const struct va_image_formats *formats, int imgfmt, int w, int h)
+struct mp_image *va_surface_pool_get_wrapped(struct va_surface_pool *pool,
+                                             const struct va_image_formats *formats,
+                                             int imgfmt, int w, int h)
 {
-    return va_surface_wrap(va_surface_pool_get_by_imgfmt(pool, formats, imgfmt, w, h));
+    return va_surface_wrap(va_surface_pool_get_by_imgfmt(pool, formats, imgfmt,
+                                                         w, h));
 }
 
 int va_surface_pool_rt_format(const struct va_surface_pool *pool)
@@ -259,7 +266,8 @@ int va_surface_pool_rt_format(const struct va_surface_pool *pool)
     return pool->rt_format;
 }
 
-bool va_surface_pool_reserve(struct va_surface_pool *pool, int count, int w, int h)
+bool va_surface_pool_reserve(struct va_surface_pool *pool, int count,
+                             int w, int h)
 {
     for (int i=0; i<pool->num_surfaces && count > 0; ++i) {
         const struct va_surface *s = pool->surfaces[i];
@@ -274,7 +282,8 @@ bool va_surface_pool_reserve(struct va_surface_pool *pool, int count, int w, int
     return !count;
 }
 
-struct va_surface *va_surface_pool_get(struct va_surface_pool *pool, int w, int h)
+struct va_surface *va_surface_pool_get(struct va_surface_pool *pool,
+                                       int w, int h)
 {
     struct va_surface *best = NULL;
     for (int i=0; i<pool->num_surfaces; ++i) {
@@ -303,12 +312,14 @@ static void va_surface_image_destroy(struct va_surface *surface)
     p->is_derived = false;
 }
 
-static VAImage *va_surface_image_alloc(struct va_surface *surface, VAImageFormat *format)
+static VAImage *va_surface_image_alloc(struct va_surface *surface,
+                                       VAImageFormat *format)
 {
     if (!format || !surface)
         return NULL;
     va_surface_priv_t *p = surface->p;
-    if (p->image.image_id != VA_INVALID_ID && p->image.format.fourcc == format->fourcc)
+    if (p->image.image_id != VA_INVALID_ID &&
+        p->image.format.fourcc == format->fourcc)
         return &p->image;
     va_surface_image_destroy(surface);
 
@@ -326,7 +337,8 @@ static VAImage *va_surface_image_alloc(struct va_surface *surface, VAImageFormat
         }
     }
     if (status != VA_STATUS_SUCCESS) {
-        status = vaCreateImage(p->display, format, surface->w, surface->h, &p->image);
+        status = vaCreateImage(p->display, format, surface->w, surface->h,
+                               &p->image);
         if (!check_va_status(status, "vaCreateImage()")) {
             p->image.image_id = VA_INVALID_ID;
             return NULL;
@@ -337,7 +349,9 @@ static VAImage *va_surface_image_alloc(struct va_surface *surface, VAImageFormat
 
 
 
-struct va_surface *va_surface_pool_get_by_imgfmt(struct va_surface_pool *pool, const struct va_image_formats *formats, int imgfmt, int w, int h)
+struct va_surface *va_surface_pool_get_by_imgfmt(struct va_surface_pool *pool,
+                                                 const struct va_image_formats *formats,
+                                                 int imgfmt, int w, int h)
 {
     if (imgfmt == IMGFMT_VAAPI)
         return va_surface_pool_get(pool, w, h);
@@ -439,7 +453,8 @@ bool va_surface_upload(struct va_surface *surface, const struct mp_image *mpi)
     return true;
 }
 
-struct mp_image *va_surface_download(const struct va_surface *surface, const struct va_image_formats *formats)
+struct mp_image *va_surface_download(const struct va_surface *surface,
+                                     const struct va_image_formats *formats)
 {
     VAStatus status = vaSyncSurface(surface->p->display, surface->id);
     if (!check_va_status(status, "vaSyncSurface()"))
@@ -455,10 +470,12 @@ struct mp_image *va_surface_download(const struct va_surface *surface, const str
         if (imgfmt == IMGFMT_NONE)
             continue;
         VAImage image;
-        status = vaCreateImage(surface->p->display, format, surface->w, surface->h, &image);
+        status = vaCreateImage(surface->p->display, format,
+                               surface->w, surface->h, &image);
         if (!check_va_status(status, "vaCreateImage()"))
             continue;
-        status = vaGetImage(surface->p->display, surface->id, 0, 0, surface->w, surface->h, image.image_id);
+        status = vaGetImage(surface->p->display, surface->id, 0, 0,
+                            surface->w, surface->h, image.image_id);
         if (status != VA_STATUS_SUCCESS) {
             vaDestroyImage(surface->p->display, image.image_id);
             continue;

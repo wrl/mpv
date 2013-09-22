@@ -98,7 +98,8 @@ static bool update_pipeline(struct vf_priv_s *p, bool deint)
     caps.output_color_standards = p->pipe.output_colors;
     caps.num_input_color_standards = VAProcColorStandardCount;
     caps.num_output_color_standards = VAProcColorStandardCount;
-    VAStatus status = vaQueryVideoProcPipelineCaps(p->display, p->context, filters, num_filters, &caps);
+    VAStatus status = vaQueryVideoProcPipelineCaps(p->display, p->context,
+                                                   filters, num_filters, &caps);
     if (!is_success(status, "vaQueryVideoProcPipelineCaps()"))
         return false;
     p->pipe.filters = filters;
@@ -110,14 +111,16 @@ static bool update_pipeline(struct vf_priv_s *p, bool deint)
     return true;
 }
 
-static inline int get_deint_field(struct vf_priv_s *p, int i, const struct mp_image *mpi)
+static inline int get_deint_field(struct vf_priv_s *p, int i,
+                                  const struct mp_image *mpi)
 {
     if (!p->do_deint || !(mpi->fields & MP_IMGFIELD_INTERLACED))
         return VA_FRAME_PICTURE;
     return !!(mpi->fields & MP_IMGFIELD_TOP_FIRST) ^ i ? VA_TOP_FIELD : VA_BOTTOM_FIELD;
 }
 
-static struct mp_image *render(struct vf_priv_s *p, struct va_surface *in, uint flags)
+static struct mp_image *render(struct vf_priv_s *p, struct va_surface *in,
+                               uint flags)
 {
     if (!p->pipe.filters || !in)
         return NULL;
@@ -133,7 +136,9 @@ static struct mp_image *render(struct vf_priv_s *p, struct va_surface *in, uint 
         state |= Begun;
         VABufferID buffer = VA_INVALID_ID;
         VAProcPipelineParameterBuffer *param = NULL;
-        status = vaCreateBuffer(p->display, p->context, VAProcPipelineParameterBufferType, sizeof(*param), 1, NULL, &buffer);
+        status = vaCreateBuffer(p->display, p->context,
+                                VAProcPipelineParameterBufferType,
+                                sizeof(*param), 1, NULL, &buffer);
         if (!is_success(status, "vaCreateBuffer()"))
             break;
         status = vaMapBuffer(p->display, buffer, (void**)&param);
@@ -165,7 +170,8 @@ static struct mp_image *render(struct vf_priv_s *p, struct va_surface *in, uint 
 }
 
 // return value: the number of created images
-static int process(struct vf_priv_s *p, struct mp_image *in, struct mp_image **out1, struct mp_image **out2)
+static int process(struct vf_priv_s *p, struct mp_image *in,
+                   struct mp_image **out1, struct mp_image **out2)
 {
     const bool deint = p->do_deint && p->deint_type > 0;
     if (!update_pipeline(p, deint) || !p->pipe.filters) // no filtering
@@ -192,7 +198,8 @@ static int process(struct vf_priv_s *p, struct mp_image *in, struct mp_image **o
 
 static struct mp_image *upload(struct vf_priv_s *p, struct mp_image *in)
 {
-    struct va_surface *surface = va_surface_pool_get_by_imgfmt(p->pool, p->va->image_formats, in->imgfmt, in->w, in->h);
+    struct va_surface *surface =
+        va_surface_pool_get_by_imgfmt(p->pool, p->va->image_formats, in->imgfmt, in->w, in->h);
     if (!surface)
         surface = va_surface_pool_get(p->pool, in->w, in->h); // dummy
     else
@@ -232,7 +239,8 @@ static int filter_ext(struct vf_instance *vf, struct mp_image *in)
     return 0;
 }
 
-static int reconfig(struct vf_instance *vf, struct mp_image_params *params, int flags)
+static int reconfig(struct vf_instance *vf, struct mp_image_params *params,
+                    int flags)
 {
     struct vf_priv_s *p = vf->priv;
 
@@ -279,16 +287,21 @@ static int control(struct vf_instance *vf, int request, void* data)
     }
 }
 
-static int va_query_filter_caps(struct vf_priv_s *p, VAProcFilterType type, void *caps, uint count)
+static int va_query_filter_caps(struct vf_priv_s *p, VAProcFilterType type,
+                                void *caps, uint count)
 {
-    VAStatus status = vaQueryVideoProcFilterCaps(p->display, p->context, type, caps, &count);
+    VAStatus status = vaQueryVideoProcFilterCaps(p->display, p->context, type,
+                                                 caps, &count);
     return is_success(status, "vaQueryVideoProcFilterCaps()") ? count : 0;
 }
 
-static VABufferID va_create_filter_buffer(struct vf_priv_s *p, int bytes, int num, void *data)
+static VABufferID va_create_filter_buffer(struct vf_priv_s *p, int bytes,
+                                          int num, void *data)
 {
     VABufferID buffer;
-    VAStatus status = vaCreateBuffer(p->display, p->context, VAProcFilterParameterBufferType, bytes, num, data, &buffer);
+    VAStatus status = vaCreateBuffer(p->display, p->context,
+                                     VAProcFilterParameterBufferType,
+                                     bytes, num, data, &buffer);
     return is_success(status, "vaCreateBuffer()") ? buffer : VA_INVALID_ID;
 }
 
@@ -297,7 +310,8 @@ static bool initialize(struct vf_priv_s *p)
     VAStatus status;
 
     VAConfigID config;
-    status = vaCreateConfig(p->display, VAProfileNone, VAEntrypointVideoProc, NULL, 0, &config);
+    status = vaCreateConfig(p->display, VAProfileNone, VAEntrypointVideoProc,
+                            NULL, 0, &config);
     if (!is_success(status, "vaCreateConfig()")) // no entrypoint for video porc
         return false;
     p->config = config;
@@ -322,7 +336,8 @@ static bool initialize(struct vf_priv_s *p)
             if (!p->deint_type)
                 continue;
             VAProcFilterCapDeinterlacing caps[VAProcDeinterlacingCount];
-            int num = va_query_filter_caps(p, VAProcFilterDeinterlacing, caps, VAProcDeinterlacingCount);
+            int num = va_query_filter_caps(p, VAProcFilterDeinterlacing, caps,
+                                           VAProcDeinterlacingCount);
             if (!num)
                 continue;
             VAProcDeinterlacingType algorithm = VAProcDeinterlacingBob;
@@ -332,7 +347,8 @@ static bool initialize(struct vf_priv_s *p)
                 VAProcFilterParameterBufferDeinterlacing param;
                 param.type = VAProcFilterDeinterlacing;
                 param.algorithm = algorithm;
-                buffers[VAProcFilterDeinterlacing] = va_create_filter_buffer(p, sizeof(param), 1, &param);
+                buffers[VAProcFilterDeinterlacing] =
+                    va_create_filter_buffer(p, sizeof(param), 1, &param);
             }
         } // check other filters
     }

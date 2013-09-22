@@ -127,7 +127,8 @@ static bool alloc_swdec_surfaces(struct priv *p, int w, int h, int imgfmt)
 {
     free_video_specific(p);
     for (int i = 0; i < MAX_OUTPUT_SURFACES; i++) {
-        p->swdec_surfaces[i] = va_surface_pool_get_wrapped(p->pool, p->va_image_formats, imgfmt, w, h);
+        p->swdec_surfaces[i] =
+            va_surface_pool_get_wrapped(p->pool, p->va_image_formats, imgfmt, w, h);
         if (!p->swdec_surfaces[i])
             return false;
     }
@@ -197,7 +198,8 @@ static bool render_to_screen(struct priv *p, struct mp_image *mpi)
         }
     }
 
-    unsigned int flags = (get_va_colorspace_flag(p->image_params.colorspace) | p->scaling);
+    unsigned int flags =
+        (get_va_colorspace_flag(p->image_params.colorspace) | p->scaling);
     status = vaPutSurface(p->display,
                           surface->id,
                           p->vo->x11->window,
@@ -256,7 +258,8 @@ static void draw_image(struct vo *vo, struct mp_image *mpi)
 
 static struct mp_image *get_screenshot(struct priv *p)
 {
-    struct va_surface *surface = va_surface_in_mp_image(p->output_surfaces[p->visible_surface]);
+    struct va_surface *surface =
+        va_surface_in_mp_image(p->output_surfaces[p->visible_surface]);
     if (!surface)
         return NULL;
     struct mp_image *img = va_surface_download(surface, p->va_image_formats);
