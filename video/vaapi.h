@@ -73,27 +73,6 @@
 #include "mpvcore/mp_msg.h"
 #include "mp_image.h"
 
-static inline bool check_va_status(VAStatus status, const char *msg)
-{
-    if (status != VA_STATUS_SUCCESS) {
-        mp_msg(MSGT_VO, MSGL_ERR, "[vaapi] %s: %s\n", msg, vaErrorStr(status));
-        return false;
-    }
-    return true;
-}
-
-static inline int get_va_colorspace_flag(enum mp_csp csp)
-{
-#if USE_VAAPI_COLORSPACE
-    switch (csp) {
-    case MP_CSP_BT_601:         return VA_SRC_BT601;
-    case MP_CSP_BT_709:         return VA_SRC_BT709;
-    case MP_CSP_SMPTE_240M:     return VA_SRC_SMPTE_240;
-    }
-#endif
-    return 0;
-}
-
 struct mp_vaapi_ctx {
     VADisplay display;
     struct va_image_formats *image_formats;
@@ -108,6 +87,9 @@ struct va_surface {
 
     struct va_surface_priv *p;
 };
+
+bool                     check_va_status(VAStatus status, const char *msg);
+int                      get_va_colorspace_flag(enum mp_csp csp);
 
 struct mp_vaapi_ctx     *va_initialize(VADisplay *display);
 void                     va_destroy(struct mp_vaapi_ctx *ctx);
