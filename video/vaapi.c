@@ -81,7 +81,7 @@ struct va_image_formats *va_image_formats_alloc(VADisplay display)
     formats->entries = talloc_array(formats, VAImageFormat, num);
     formats->num = num;
     VA_VERBOSE("%d image formats available:\n", num);
-    for (int i=0; i<num; ++i) {
+    for (int i = 0; i < num; i++) {
         formats->entries[i] = entries[i];
         VA_VERBOSE("  %s\n", VA_STR_FOURCC(entries[i].fourcc));
     }
@@ -128,7 +128,7 @@ VAImageFormat *va_image_format_from_imgfmt(const struct va_image_formats *format
     const int fourcc = va_fourcc_from_imgfmt(imgfmt);
     if (!formats || !formats->num || !fourcc)
         return NULL;
-    for (int i=0; i<formats->num; ++i) {
+    for (int i = 0; i < formats->num; i++) {
         if (formats->entries[i].fourcc == fourcc)
             return &formats->entries[i];
     }
@@ -443,9 +443,9 @@ bool va_surface_upload(struct va_surface *surface, const struct mp_image *mpi)
 
     if (!p->is_derived) {
         VAStatus status = vaPutImage2(p->display, surface->id,
-                             p->image.image_id,
-                             0, 0, mpi->w, mpi->h,
-                             0, 0, mpi->w, mpi->h);
+                                      p->image.image_id,
+                                      0, 0, mpi->w, mpi->h,
+                                      0, 0, mpi->w, mpi->h);
         if (!check_va_status(status, "vaPutImage()"))
             return false;
     }
@@ -464,7 +464,7 @@ struct mp_image *va_surface_download(const struct va_surface *surface,
     // This code is just for screenshots, so it's ok not to cache the right
     // format (to prevent unnecessary work), and we don't attempt to use
     // vaDeriveImage() for direct access either.
-    for (int i=0; i<formats->num; ++i) {
+    for (int i = 0; i < formats->num; i++) {
         VAImageFormat *format = &formats->entries[i];
         const enum mp_imgfmt imgfmt = va_fourcc_to_imgfmt(format->fourcc);
         if (imgfmt == IMGFMT_NONE)
