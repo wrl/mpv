@@ -120,7 +120,7 @@ static inline int get_deint_field(struct vf_priv_s *p, int i,
 }
 
 static struct mp_image *render(struct vf_priv_s *p, struct va_surface *in,
-                               uint flags)
+                               unsigned int flags)
 {
     if (!p->pipe.filters || !in)
         return NULL;
@@ -177,8 +177,8 @@ static int process(struct vf_priv_s *p, struct mp_image *in,
     if (!update_pipeline(p, deint) || !p->pipe.filters) // no filtering
         return 0;
     struct va_surface *surface = va_surface_in_mp_image(in);
-    const uint csp = get_va_colorspace_flag(p->params.colorspace);
-    const uint field = get_deint_field(p, 0, in);
+    const unsigned int csp = get_va_colorspace_flag(p->params.colorspace);
+    const unsigned int field = get_deint_field(p, 0, in);
     *out1 = render(p, surface, field | csp);
     if (!*out1) // cannot render
         return 0;
@@ -288,7 +288,7 @@ static int control(struct vf_instance *vf, int request, void* data)
 }
 
 static int va_query_filter_caps(struct vf_priv_s *p, VAProcFilterType type,
-                                void *caps, uint count)
+                                void *caps, unsigned int count)
 {
     VAStatus status = vaQueryVideoProcFilterCaps(p->display, p->context, type,
                                                  caps, &count);
