@@ -809,10 +809,10 @@ static int control(sh_video_t *sh, int cmd, void *arg)
         return CONTROL_TRUE;
     case VDCTRL_REINIT_VO:
         if (ctx->vo_image_params.imgfmt)
-            mpcodecs_reconfig_vo(sh, &ctx->image_params);
+            mpcodecs_reconfig_vo(sh, &ctx->vo_image_params);
         return true;
     case VDCTRL_GET_PARAMS:
-        *(struct mp_image_params *)arg = ctx->image_params;
+        *(struct mp_image_params *)arg = ctx->vo_image_params;
         return ctx->vo_image_params.imgfmt ? true : CONTROL_NA;
     }
     return CONTROL_UNKNOWN;
