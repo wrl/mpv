@@ -750,8 +750,10 @@ static int decode(struct sh_video *sh, struct demux_packet *packet,
 
     if (!mp_image_params_equals(&vo_params, &ctx->vo_image_params)) {
         ctx->vo_image_params = vo_params;
-        if (mpcodecs_reconfig_vo(sh, &ctx->vo_image_params) < 0)
+        if (mpcodecs_reconfig_vo(sh, &ctx->vo_image_params) < 0) {
+            talloc_free(mpi);
             return -1;
+        }
     }
 
     *out_image = mpi;
