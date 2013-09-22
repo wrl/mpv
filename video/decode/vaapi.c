@@ -351,9 +351,9 @@ static void uninit(struct lavc_ctx *ctx)
 
     destroy_decoder(ctx);
 
+    va_surface_pool_release(p->pool);
     talloc_free(p);
     ctx->hwdec_priv = NULL;
-    va_surface_pool_release(p->pool);
 }
 
 static int init(struct lavc_ctx *ctx)
