@@ -547,7 +547,6 @@ static int preinit(struct vo *vo)
         return -1;
     }
 
-    p->mpvaapi->priv = vo;
     p->pool = va_surface_pool_alloc(p->display, VA_RT_FORMAT_YUV420);
     p->va_image_formats = p->mpvaapi->image_formats;
 
