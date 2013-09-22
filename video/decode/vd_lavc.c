@@ -468,7 +468,7 @@ static void uninit(sh_video_t *sh)
     talloc_free(ctx);
 }
 
-static int update_image_params(sh_video_t *sh, AVFrame *frame)
+static void update_image_params(sh_video_t *sh, AVFrame *frame)
 {
     vd_ffmpeg_ctx *ctx = sh->context;
     int width = frame->width;
@@ -515,7 +515,6 @@ static int update_image_params(sh_video_t *sh, AVFrame *frame)
                 avchroma_location_to_mp(ctx->avctx->chroma_sample_location),
         };
     }
-    return 0;
 }
 
 static enum PixelFormat get_format_hwdec(struct AVCodecContext *avctx,
@@ -737,8 +736,7 @@ static int decode(struct sh_video *sh, struct demux_packet *packet,
     if (!got_picture)
         return 0;                     // skipped image
 
-    if (update_image_params(sh, pic) < 0)
-        return -1;
+    update_image_params(sh, pic);
 
     struct mp_image *mpi = image_from_decoder(sh);
     assert(mpi->planes[0]);
