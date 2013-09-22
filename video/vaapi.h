@@ -110,6 +110,9 @@ struct va_surface {
     struct va_surface_priv *p;
 };
 
+struct mp_vaapi_ctx     *va_initialize(VADisplay *display);
+void                     va_destroy(struct mp_vaapi_ctx *ctx);
+
 enum mp_imgfmt           va_fourcc_to_imgfmt(uint32_t fourcc);
 uint32_t                 va_fourcc_from_imgfmt(int imgfmt);
 struct va_image_formats *va_image_formats_alloc(VADisplay display);

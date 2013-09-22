@@ -72,6 +72,35 @@ void va_image_formats_release(struct va_image_formats *formats)
     talloc_free(formats);
 }
 
+struct mp_vaapi_ctx *va_initialize(VADisplay *display)
+{
+    int major_version, minor_version;
+    int status = vaInitialize(display, &major_version, &minor_version);
+    if (!check_va_status(status, "vaInitialize()"))
+        return NULL;
+
+    VA_VERBOSE("VA API version %d.%d\n", major_version, minor_version);
+
+    struct mp_vaapi_ctx *res = talloc_ptrtype(NULL, res);
+    *res = (struct mp_vaapi_ctx) {
+        .display = display,
+    };
+
+    res->image_formats = va_image_formats_alloc(res->display);
+    return res;
+}
+
+// Undo va_initialize, and close the VADisplay.
+void va_destroy(struct mp_vaapi_ctx *ctx)
+{
+    if (ctx) {
+        if (ctx->display)
+            vaTerminate(ctx->display);
+        va_image_formats_release(ctx->image_formats);
+        talloc_free(ctx);
+    }
+}
+
 VAImageFormat *va_image_format_from_imgfmt(const struct va_image_formats *formats, int imgfmt)
 {
     const int fourcc = va_fourcc_from_imgfmt(imgfmt);

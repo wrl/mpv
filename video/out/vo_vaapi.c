@@ -70,7 +70,7 @@ struct priv {
     struct mp_log           *log;
     struct vo               *vo;
     VADisplay                display;
-    struct mp_vaapi_ctx      mpvaapi;
+    struct mp_vaapi_ctx     *mpvaapi;
 
     struct mp_image_params   image_params;
     struct mp_rect           src_rect;
@@ -475,7 +475,7 @@ static int control(struct vo *vo, uint32_t request, void *data)
     switch (request) {
     case VOCTRL_GET_HWDEC_INFO: {
         struct mp_hwdec_info *arg = data;
-        arg->vaapi_ctx = &p->mpvaapi;
+        arg->vaapi_ctx = p->mpvaapi;
         return true;
     }
     case VOCTRL_SET_EQUALIZER: {
@@ -515,17 +515,13 @@ static void uninit(struct vo *vo)
 
     free_video_specific(p);
     va_surface_pool_release(p->pool);
-    va_image_formats_release(p->mpvaapi.image_formats);
 
     for (int n = 0; n < MAX_OSD_PARTS; n++) {
         struct vaapi_osd_part *part = &p->osd_parts[n];
         free_subpicture(p, &part->image);
     }
 
-    if (p->display) {
-        vaTerminate(p->display);
-        p->display = NULL;
-    }
+    va_destroy(p->mpvaapi);
 
     vo_x11_uninit(vo);
 }
@@ -545,18 +541,15 @@ static int preinit(struct vo *vo)
     if (!p->display)
         return -1;
 
-    int major_version, minor_version;
-    status = vaInitialize(p->display, &major_version, &minor_version);
-    if (!check_va_status(status, "vaInitialize()"))
+    p->mpvaapi = va_initialize(p->display);
+    if (!p->mpvaapi) {
+        vaTerminate(p->display);
         return -1;
-    MP_VERBOSE(vo, "VA API version %d.%d\n", major_version, minor_version);
+    }
 
+    p->mpvaapi->priv = vo;
     p->pool = va_surface_pool_alloc(p->display, VA_RT_FORMAT_YUV420);
-    p->va_image_formats = va_image_formats_alloc(p->display);
-
-    p->mpvaapi.display = p->display;
-    p->mpvaapi.image_formats = p->va_image_formats;
-    p->mpvaapi.priv = vo;
+    p->va_image_formats = p->mpvaapi->image_formats;
 
     int max_subpic_formats = vaMaxNumSubpictureFormats(p->display);
     p->va_subpic_formats = talloc_array(vo, VAImageFormat, max_subpic_formats);
