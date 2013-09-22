@@ -1140,7 +1140,7 @@ static const char *deint_filters[] = {
     "lavfi=yadif",
 #endif
     "yadif",
-#if CONFIG_VAAPI
+#if CONFIG_VAAPI_VPP
     "vavpp",
 #endif
     NULL
