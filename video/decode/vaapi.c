@@ -67,6 +67,8 @@ struct priv {
 
     struct va_surface_pool *pool;
     int rt_format;
+
+    bool printed_readback_warning;
 };
 
 struct profile_entry {
@@ -466,6 +468,11 @@ static struct mp_image *copy_image(struct lavc_ctx *ctx, struct mp_image *img)
         struct mp_image *simg =
             va_surface_download(surface, p->ctx->image_formats);
         if (simg) {
+            if (!p->printed_readback_warning) {
+                mp_msg(MSGT_VO, MSGL_WARN, "[vaapi] Using GPU readback. This "
+                       "is usually inefficient.\n");
+                p->printed_readback_warning = true;
+            }
             talloc_free(img);
             return simg;
         }
