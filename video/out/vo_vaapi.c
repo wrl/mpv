@@ -174,25 +174,6 @@ static int query_format(struct vo *vo, uint32_t imgfmt)
     return 0;
 }
 
-static bool put_surface(struct priv *p, VASurfaceID surface, int flags)
-{
-    VAStatus status;
-    status = vaPutSurface(p->display,
-                          surface,
-                          p->vo->x11->window,
-                          p->src_rect.x0,
-                          p->src_rect.y0,
-                          p->src_rect.x1 - p->src_rect.x0,
-                          p->src_rect.y1 - p->src_rect.y0,
-                          p->dst_rect.x0,
-                          p->dst_rect.y0,
-                          p->dst_rect.x1 - p->dst_rect.x0,
-                          p->dst_rect.y1 - p->dst_rect.y0,
-                          NULL, 0,
-                          flags);
-    return check_va_status(status, "vaPutSurface()");
-}
-
 static bool render_to_screen(struct priv *p, struct mp_image *mpi)
 {
     bool res = true;
@@ -220,20 +201,27 @@ static bool render_to_screen(struct priv *p, struct mp_image *mpi)
         }
     }
 
-    unsigned int flags =
-        (va_get_colorspace_flag(p->image_params.colorspace) | p->scaling);
-
-    if (!p->deint) {
-        put_surface(p, surface, flags);
+    int flags = va_get_colorspace_flag(p->image_params.colorspace) | p->scaling;
+    if (p->deint && (mpi->fields & MP_IMGFIELD_INTERLACED)) {
+        flags |= (mpi->fields & MP_IMGFIELD_TOP_FIRST) ?
+                                            VA_BOTTOM_FIELD : VA_TOP_FIELD;
     } else {
-        // Deinterlacing with old libva versions
-        for (int i = 0; i <= !!(p->deint > 1); i++) {
-            int img_flags = p->deint && (mpi->fields & MP_IMGFIELD_INTERLACED) ?
-                            (((!!(mpi->fields & MP_IMGFIELD_TOP_FIRST)) ^ i) == 0 ?
-                            VA_BOTTOM_FIELD : VA_TOP_FIELD) : VA_FRAME_PICTURE;
-            put_surface(p, surface, flags | img_flags);
-        }
+        flags |= VA_FRAME_PICTURE;
     }
+    status = vaPutSurface(p->display,
+                          surface,
+                          p->vo->x11->window,
+                          p->src_rect.x0,
+                          p->src_rect.y0,
+                          p->src_rect.x1 - p->src_rect.x0,
+                          p->src_rect.y1 - p->src_rect.y0,
+                          p->dst_rect.x0,
+                          p->dst_rect.y0,
+                          p->dst_rect.x1 - p->dst_rect.x0,
+                          p->dst_rect.y1 - p->dst_rect.y0,
+                          NULL, 0,
+                          flags);
+    check_va_status(status, "vaPutSurface()");
 
     for (int n = 0; n < MAX_OSD_PARTS; n++) {
         struct vaapi_osd_part *part = &p->osd_parts[n];
