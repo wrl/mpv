@@ -221,7 +221,7 @@ static bool render_to_screen(struct priv *p, struct mp_image *mpi)
     }
 
     unsigned int flags =
-        (get_va_colorspace_flag(p->image_params.colorspace) | p->scaling);
+        (va_get_colorspace_flag(p->image_params.colorspace) | p->scaling);
 #if CONFIG_VAAPI_VPP
     put_surface(p, surface, flags);
 #else

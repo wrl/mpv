@@ -1,7 +1,27 @@
-#include "vaapi.h"
-#include "img_format.h"
-#include "assert.h"
+/*
+ * This file is part of mpv.
+ *
+ * mpv is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * mpv is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with mpv.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <assert.h>
 #include <libavutil/avutil.h>
+
+#include "vaapi.h"
+#include "mpvcore/mp_msg.h"
+#include "mp_image.h"
+#include "img_format.h"
 
 #define VA_VERBOSE(...) mp_msg(MSGT_VO, MSGL_V, "[vaapi] "  __VA_ARGS__)
 #define VA_ERROR(...) mp_msg(MSGT_VO, MSGL_ERR, "[vaapi] "  __VA_ARGS__)
@@ -15,7 +35,7 @@ bool check_va_status(VAStatus status, const char *msg)
     return true;
 }
 
-int get_va_colorspace_flag(enum mp_csp csp)
+int va_get_colorspace_flag(enum mp_csp csp)
 {
 #if USE_VAAPI_COLORSPACE
     switch (csp) {

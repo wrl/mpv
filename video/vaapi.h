@@ -70,7 +70,6 @@
 #define VA_STR_FOURCC(fcc) \
     (const char[]){(fcc), (fcc) >> 8u, (fcc) >> 16u, (fcc) >> 24u, 0}
 
-#include "mpvcore/mp_msg.h"
 #include "mp_image.h"
 
 struct mp_vaapi_ctx {
@@ -89,7 +88,8 @@ struct va_surface {
 };
 
 bool                     check_va_status(VAStatus status, const char *msg);
-int                      get_va_colorspace_flag(enum mp_csp csp);
+
+int                      va_get_colorspace_flag(enum mp_csp csp);
 
 struct mp_vaapi_ctx     *va_initialize(VADisplay *display);
 void                     va_destroy(struct mp_vaapi_ctx *ctx);

@@ -15,13 +15,14 @@
  * with mpv.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <va/va.h>
+#include <va/va_vpp.h>
+
 #include "config.h"
 #include "mpvcore/options.h"
 #include "vf.h"
 #include "video/vaapi.h"
 #include "video/decode/dec_video.h"
-#include <va/va.h>
-#include <va/va_vpp.h>
 
 static inline bool is_success(VAStatus status, const char *msg)
 {
@@ -177,7 +178,7 @@ static int process(struct vf_priv_s *p, struct mp_image *in,
     if (!update_pipeline(p, deint) || !p->pipe.filters) // no filtering
         return 0;
     struct va_surface *surface = va_surface_in_mp_image(in);
-    const unsigned int csp = get_va_colorspace_flag(p->params.colorspace);
+    const unsigned int csp = va_get_colorspace_flag(p->params.colorspace);
     const unsigned int field = get_deint_field(p, 0, in);
     *out1 = render(p, surface, field | csp);
     if (!*out1) // cannot render
