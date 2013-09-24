@@ -100,7 +100,6 @@ VAImageFormat *          va_image_format_from_imgfmt(const struct va_image_forma
 bool                     va_image_map(VADisplay display, VAImage *image, struct mp_image *mpi);
 bool                     va_image_unmap(VADisplay display, VAImage *image);
 
-// ctx can be NULL. pool can be shared by specifying the same ctx value.
 struct va_surface_pool * va_surface_pool_alloc(VADisplay display, int rt_format);
 void                     va_surface_pool_release(struct va_surface_pool *pool);
 void                     va_surface_pool_releasep(struct va_surface_pool **pool);
