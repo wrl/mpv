@@ -174,11 +174,11 @@ static int query_format(struct vo *vo, uint32_t imgfmt)
     return 0;
 }
 
-static bool put_surface(struct priv *p, struct va_surface *surface, int flags)
+static bool put_surface(struct priv *p, VASurfaceID surface, int flags)
 {
     VAStatus status;
     status = vaPutSurface(p->display,
-                          surface->id,
+                          surface,
                           p->vo->x11->window,
                           p->src_rect.x0,
                           p->src_rect.y0,
@@ -198,8 +198,8 @@ static bool render_to_screen(struct priv *p, struct mp_image *mpi)
     bool res = true;
     VAStatus status;
 
-    struct va_surface *surface = va_surface_in_mp_image(mpi);
-    if (!surface)
+    VASurfaceID surface = va_surface_id_in_mp_image(mpi);
+    if (surface == VA_INVALID_ID)
         return false;
 
     for (int n = 0; n < MAX_OSD_PARTS; n++) {
@@ -210,7 +210,7 @@ static bool render_to_screen(struct priv *p, struct mp_image *mpi)
             if (p->osd_screen)
                 flags |= VA_SUBPICTURE_DESTINATION_IS_SCREEN_COORD;
             status = vaAssociateSubpicture2(p->display,
-                                            sp->id, &surface->id, 1,
+                                            sp->id, &surface, 1,
                                             sp->src_x, sp->src_y,
                                             sp->src_w, sp->src_h,
                                             sp->dst_x, sp->dst_y,
@@ -227,10 +227,10 @@ static bool render_to_screen(struct priv *p, struct mp_image *mpi)
 #else
     // Deinterlacing with old libva versions
     for (int i = 0; i <= !!(p->deint > 1); i++) {
-        int img_flags = p->deint && (flags & MP_IMGFIELD_INTERLACED) ?
-                        (((!!(flags & MP_IMGFIELD_TOP_FIRST)) ^ i) == 0 ?
+        int img_flags = p->deint && (mpi->fields & MP_IMGFIELD_INTERLACED) ?
+                        (((!!(mpi->fields & MP_IMGFIELD_TOP_FIRST)) ^ i) == 0 ?
                          VA_BOTTOM_FIELD : VA_TOP_FIELD) : VA_FRAME_PICTURE;
-        put_surface(p, surface, img_flags);
+        put_surface(p, surface, flags | img_flags);
     }
 #endif
 
@@ -239,7 +239,7 @@ static bool render_to_screen(struct priv *p, struct mp_image *mpi)
         if (part->active) {
             struct vaapi_subpic *sp = &part->subpic;
             status = vaDeassociateSubpicture(p->display, sp->id,
-                                             &surface->id, 1);
+                                             &surface, 1);
             check_va_status(status, "vaDeassociateSubpicture()");
         }
     }
