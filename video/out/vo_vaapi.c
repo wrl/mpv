@@ -222,17 +222,18 @@ static bool render_to_screen(struct priv *p, struct mp_image *mpi)
 
     unsigned int flags =
         (va_get_colorspace_flag(p->image_params.colorspace) | p->scaling);
-#if CONFIG_VAAPI_VPP
-    put_surface(p, surface, flags);
-#else
-    // Deinterlacing with old libva versions
-    for (int i = 0; i <= !!(p->deint > 1); i++) {
-        int img_flags = p->deint && (mpi->fields & MP_IMGFIELD_INTERLACED) ?
-                        (((!!(mpi->fields & MP_IMGFIELD_TOP_FIRST)) ^ i) == 0 ?
-                         VA_BOTTOM_FIELD : VA_TOP_FIELD) : VA_FRAME_PICTURE;
-        put_surface(p, surface, flags | img_flags);
+
+    if (!p->deint) {
+        put_surface(p, surface, flags);
+    } else {
+        // Deinterlacing with old libva versions
+        for (int i = 0; i <= !!(p->deint > 1); i++) {
+            int img_flags = p->deint && (mpi->fields & MP_IMGFIELD_INTERLACED) ?
+                            (((!!(mpi->fields & MP_IMGFIELD_TOP_FIRST)) ^ i) == 0 ?
+                            VA_BOTTOM_FIELD : VA_TOP_FIELD) : VA_FRAME_PICTURE;
+            put_surface(p, surface, flags | img_flags);
+        }
     }
-#endif
 
     for (int n = 0; n < MAX_OSD_PARTS; n++) {
         struct vaapi_osd_part *part = &p->osd_parts[n];
@@ -494,14 +495,16 @@ static int control(struct vo *vo, uint32_t request, void *data)
     struct priv *p = vo->priv;
 
     switch (request) {
-#if !CONFIG_VAAPI_VPP
     case VOCTRL_GET_DEINTERLACE:
+        if (!p->deint_type)
+            break;
         *(int*)data = !!p->deint;
         return VO_TRUE;
     case VOCTRL_SET_DEINTERLACE:
+        if (!p->deint_type)
+            break;
         p->deint = *(int*)data ? p->deint_type : 0;
         return VO_TRUE;
-#endif
     case VOCTRL_GET_HWDEC_INFO: {
         struct mp_hwdec_info *arg = data;
         arg->vaapi_ctx = p->mpvaapi;
@@ -645,8 +648,10 @@ const struct vo_driver video_out_vaapi = {
     .priv_size = sizeof(struct priv),
     .priv_defaults = &(const struct priv) {
         .scaling = VA_FILTER_SCALING_DEFAULT,
-        .deint_type = 2,
         .deint = 0,
+#if !CONFIG_VAAPI_VPP
+        .deint_type = 2,
+#endif
     },
     .options = (const struct m_option[]) {
 #if USE_VAAPI_SCALING
@@ -656,12 +661,10 @@ const struct vo_driver video_out_vaapi = {
                     {"hq", VA_FILTER_SCALING_HQ},
                     {"nla", VA_FILTER_SCALING_NL_ANAMORPHIC})),
 #endif
-#if !CONFIG_VAAPI_VPP
         OPT_CHOICE("deint", deint_type, 0,
                    ({"no", 0},
                     {"first-field", 1},
                     {"bob", 2})),
-#endif
         OPT_FLAG("scaled-osd", force_scaled_osd, 0),
         {0}
     },
