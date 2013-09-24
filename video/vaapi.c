@@ -192,12 +192,6 @@ void va_surface_pool_clear(struct va_surface_pool *pool)
     pool->num_surfaces = 0;
 }
 
-struct va_surface *va_surface_in_mp_image(struct mp_image *mpi)
-{
-    return mpi && IMGFMT_IS_VAAPI(mpi->imgfmt) ?
-        (struct va_surface*)(uintptr_t)mpi->planes[0] : NULL;
-}
-
 void va_surface_destroy(struct va_surface *surface)
 {
     if (!surface)
@@ -386,14 +380,20 @@ struct mp_image *va_surface_wrap(struct va_surface *surface)
     return mp_image_new_custom_ref(&img, surface, free_va_surface);
 }
 
-VASurfaceID va_surface_id(const struct va_surface *surface)
-{
-    return surface->id;
-}
-
 VASurfaceID va_surface_id_in_mp_image(const struct mp_image *mpi)
 {
     return (VASurfaceID)(uintptr_t)mpi->planes[3];
+}
+
+struct va_surface *va_surface_in_mp_image(struct mp_image *mpi)
+{
+    return mpi && IMGFMT_IS_VAAPI(mpi->imgfmt) ?
+        (struct va_surface*)(uintptr_t)mpi->planes[0] : NULL;
+}
+
+VASurfaceID va_surface_id(const struct va_surface *surface)
+{
+    return surface->id;
 }
 
 bool va_image_map(VADisplay display, VAImage *image, struct mp_image *mpi)
