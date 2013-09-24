@@ -375,7 +375,7 @@ struct mp_image *va_surface_wrap(struct va_surface *surface)
     struct mp_image img = {0};
     mp_image_setfmt(&img, IMGFMT_VAAPI);
     mp_image_set_size(&img, surface->w, surface->h);
-    img.planes[0] = (uint8_t*)(uintptr_t)surface;
+    img.planes[0] = (uint8_t*)surface;
     img.planes[3] = (uint8_t*)(uintptr_t)surface->id;
     return mp_image_new_custom_ref(&img, surface, free_va_surface);
 }
@@ -388,7 +388,7 @@ VASurfaceID va_surface_id_in_mp_image(const struct mp_image *mpi)
 struct va_surface *va_surface_in_mp_image(struct mp_image *mpi)
 {
     return mpi && IMGFMT_IS_VAAPI(mpi->imgfmt) ?
-        (struct va_surface*)(uintptr_t)mpi->planes[0] : NULL;
+        (struct va_surface*)mpi->planes[0] : NULL;
 }
 
 VASurfaceID va_surface_id(const struct va_surface *surface)
