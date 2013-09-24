@@ -179,7 +179,7 @@ static bool preallocate_surfaces(struct lavc_ctx *ctx, int num)
         mp_msg(MSGT_VO, MSGL_ERR, "[vaapi] Could not allocate surfaces.\n");
         return false;
     }
-    for (int i=0; i<num; ++i) {
+    for (int i = 0; i < num; i++) {
         struct va_surface *s = va_surface_pool_get(p->pool, p->w, p->h);
         p->surfaces[i] = s->id;
         va_surface_release(s);
