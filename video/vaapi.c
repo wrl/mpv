@@ -90,14 +90,14 @@ struct va_image_formats {
     int num;
 };
 
-struct va_image_formats *va_image_formats_alloc(VADisplay display)
+static void va_get_formats(struct mp_vaapi_ctx *ctx)
 {
-    int num = vaMaxNumImageFormats(display);
+    int num = vaMaxNumImageFormats(ctx->display);
     VAImageFormat entries[num];
-    VAStatus status = vaQueryImageFormats(display, entries, &num);
+    VAStatus status = vaQueryImageFormats(ctx->display, entries, &num);
     if (!check_va_status(status, "vaQueryImageFormats()"))
-        return NULL;
-    struct va_image_formats *formats = talloc_ptrtype(NULL, formats);
+        return;
+    struct va_image_formats *formats = talloc_ptrtype(ctx, formats);
     formats->entries = talloc_array(formats, VAImageFormat, num);
     formats->num = num;
     VA_VERBOSE("%d image formats available:\n", num);
@@ -105,12 +105,7 @@ struct va_image_formats *va_image_formats_alloc(VADisplay display)
         formats->entries[i] = entries[i];
         VA_VERBOSE("  %s\n", VA_STR_FOURCC(entries[i].fourcc));
     }
-    return formats;
-}
-
-void va_image_formats_release(struct va_image_formats *formats)
-{
-    talloc_free(formats);
+    ctx->image_formats = formats;
 }
 
 struct mp_vaapi_ctx *va_initialize(VADisplay *display)
@@ -127,8 +122,16 @@ struct mp_vaapi_ctx *va_initialize(VADisplay *display)
         .display = display,
     };
 
-    res->image_formats = va_image_formats_alloc(res->display);
+    va_get_formats(res);
+    if (!res->image_formats)
+        goto error;
     return res;
+
+error:
+    if (res->display)
+        vaTerminate(res->display);
+    talloc_free(res);
+    return NULL;
 }
 
 // Undo va_initialize, and close the VADisplay.
@@ -137,7 +140,6 @@ void va_destroy(struct mp_vaapi_ctx *ctx)
     if (ctx) {
         if (ctx->display)
             vaTerminate(ctx->display);
-        va_image_formats_release(ctx->image_formats);
         talloc_free(ctx);
     }
 }

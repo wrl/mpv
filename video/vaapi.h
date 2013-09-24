@@ -96,8 +96,6 @@ void                     va_destroy(struct mp_vaapi_ctx *ctx);
 
 enum mp_imgfmt           va_fourcc_to_imgfmt(uint32_t fourcc);
 uint32_t                 va_fourcc_from_imgfmt(int imgfmt);
-struct va_image_formats *va_image_formats_alloc(VADisplay display);
-void                     va_image_formats_release(struct va_image_formats *formats);
 VAImageFormat *          va_image_format_from_imgfmt(const struct va_image_formats *formats, int imgfmt);
 bool                     va_image_map(VADisplay display, VAImage *image, struct mp_image *mpi);
 bool                     va_image_unmap(VADisplay display, VAImage *image);
