@@ -23,10 +23,13 @@
 #include "wayland_common.h"
 #include "gl_common.h"
 
+static const struct wl_callback_listener frame_listener;
+
 struct egl_context {
     EGLSurface egl_surface;
 
     struct wl_egl_window *egl_window;
+    struct wl_callback *redraw_callback;
 
     struct {
         EGLDisplay dpy;
@@ -34,6 +37,7 @@ struct egl_context {
         EGLConfig conf;
     } egl;
 };
+
 
 static void egl_resize(struct vo_wayland_state *wl,
                        struct egl_context *ctx)
@@ -167,7 +171,6 @@ static void egl_create_window(struct vo_wayland_state *wl,
                    egl_ctx->egl.ctx);
 
     wl_display_dispatch_pending(wl->display.display);
-
 }
 
 static bool config_window_wayland(struct MPGLContext *ctx,
@@ -219,16 +222,39 @@ static void releaseGlContext_wayland(MPGLContext *ctx)
     egl_ctx->egl.ctx = NULL;
 }
 
+static void frame_handle_redraw(void *data,
+                                struct wl_callback *callback,
+                                uint32_t time)
+{
+    MPGLContext *ctx = data;
+    struct egl_context * egl_ctx = ctx->priv;
+    struct vo_wayland_state *wl = ctx->vo->wayland;
+
+    if (callback)
+        wl_callback_destroy(callback);
+
+    egl_ctx->redraw_callback = wl_surface_frame(wl->window.surface);
+    wl_callback_add_listener(egl_ctx->redraw_callback, &frame_listener, ctx);
+
+    eglSwapBuffers(egl_ctx->egl.dpy, egl_ctx->egl_surface);
+}
+
+
 static void swapGlBuffers_wayland(MPGLContext *ctx)
 {
     struct egl_context * egl_ctx = ctx->priv;
     struct vo_wayland_state *wl = ctx->vo->wayland;
 
-    eglSwapBuffers(egl_ctx->egl.dpy, egl_ctx->egl_surface);
+    if (!egl_ctx->redraw_callback)
+        frame_handle_redraw(ctx, NULL, 0);
 
     if (wl->window.events & VO_EVENT_RESIZE)
         egl_resize(wl, egl_ctx);
 }
+
+static const struct wl_callback_listener frame_listener = {
+    frame_handle_redraw
+};
 
 void mpgl_set_backend_wayland(MPGLContext *ctx)
 {
