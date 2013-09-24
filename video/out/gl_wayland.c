@@ -30,6 +30,7 @@ struct egl_context {
 
     struct wl_egl_window *egl_window;
     struct wl_callback *redraw_callback;
+    struct wl_callback *redraw_callback2;
 
     struct {
         EGLDisplay dpy;
@@ -230,11 +231,14 @@ static void frame_handle_redraw(void *data,
     struct egl_context * egl_ctx = ctx->priv;
     struct vo_wayland_state *wl = ctx->vo->wayland;
 
+
     if (callback)
         wl_callback_destroy(callback);
 
     egl_ctx->redraw_callback = wl_surface_frame(wl->window.surface);
     wl_callback_add_listener(egl_ctx->redraw_callback, &frame_listener, ctx);
+    egl_ctx->redraw_callback2 = wl_surface_frame(wl->window.surface);
+    wl_callback_add_listener(egl_ctx->redraw_callback2, &frame_listener, ctx);
 
     eglSwapBuffers(egl_ctx->egl.dpy, egl_ctx->egl_surface);
 }
