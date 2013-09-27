@@ -120,10 +120,18 @@ static struct vo_cocoa_state *vo_cocoa_init_state(struct vo *vo)
     return s;
 }
 
-static NSRect to_pixels(struct vo *vo, NSRect frame)
+static NSRect rect_to_pixels(struct vo *vo, NSRect frame)
 {
     struct vo_cocoa_state *s = vo->cocoa;
-    return [s->view convertRectToBacking: frame];
+    return [s->view convertRectToBacking:frame];
+}
+
+static NSPoint point_to_pixels(struct vo *vo, NSPoint point)
+{
+    struct vo_cocoa_state *s = vo->cocoa;
+    NSPoint p = [s->view convertPointToBacking:point];
+    p.y += vo->dheight;
+    return p;
 }
 
 void *vo_cocoa_glgetaddr(const char *s)
@@ -253,7 +261,7 @@ static void vo_cocoa_update_screen_info(struct vo *vo)
 static void resize_window(struct vo *vo)
 {
     struct vo_cocoa_state *s = vo->cocoa;
-    NSRect frame = to_pixels(vo, [s->view frame]);
+    NSRect frame = rect_to_pixels(vo, [s->view frame]);
     vo->dwidth  = frame.size.width;
     vo->dheight = frame.size.height;
     [s->glContext update];
@@ -837,14 +845,14 @@ int vo_cocoa_cgl_color_size(struct vo *vo)
 
 - (void)signalMousePosition
 {
-    NSPoint p = [self convertPoint:[self mouseLocation] fromView:nil];
+    NSPoint p = point_to_pixels(self.videoOutput, [self mouseLocation]);
     vo_mouse_movement(self.videoOutput, p.x, p.y);
 }
 
 - (void)signalMouseMovement:(NSEvent *)event
 {
     [self recalcDraggableState];
-    NSPoint p = [self convertPoint:[event locationInWindow] fromView:nil];
+    NSPoint p = point_to_pixels(self.videoOutput, [event locationInWindow]);
     vo_mouse_movement(self.videoOutput, p.x, p.y);
 }
 
@@ -909,7 +917,7 @@ int vo_cocoa_cgl_color_size(struct vo *vo)
 
     if (vo && resize_callback_registered(vo)) {
         if ([self inLiveResize]) {
-            NSSize size = to_pixels(vo, [self bounds]).size;
+            NSSize size = rect_to_pixels(vo, [self bounds]).size;
             resize_redraw(vo, size.width, size.height);
         } else {
             // If not in live resize window was probably resized from
