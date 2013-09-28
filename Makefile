@@ -131,8 +131,7 @@ endif
 
 SOURCES-$(DLOPEN)               += video/filter/vf_dlopen.c
 
-SOURCES = talloc.c \
-          audio/audio.c \
+SOURCES = audio/audio.c \
           audio/chmap.c \
           audio/chmap_sel.c \
           audio/fmt-conversion.c \
@@ -235,6 +234,8 @@ SOURCES = talloc.c \
           sub/sd_srt.c \
           sub/spudec.c \
           sub/sub.c \
+          tra/tra.c \
+          tra/tra_talloc.c \
           video/csputils.c \
           video/fmt-conversion.c \
           video/image_writer.c \
