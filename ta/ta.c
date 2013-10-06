@@ -398,13 +398,14 @@ void ta_enable_leak_report(void)
 /* Set a (static) string that will be printed if the memory allocation in ptr
  * shows up on the leak report. The string must stay valid until ptr is freed.
  * Calling it on ptr==NULL does nothing.
+ * Typically used to set location info.
  * Always returns ptr (useful for chaining function calls).
  */
-void *ta_dbg_set_name(void *ptr, const char *name)
+void *ta_dbg_set_loc(void *ptr, const char *loc)
 {
     struct ta_header *h = get_header(ptr);
     if (h)
-        h->name = name;
+        h->name = loc;
     return ptr;
 }
 
@@ -413,7 +414,7 @@ void *ta_dbg_set_name(void *ptr, const char *name)
 void *ta_dbg_mark_as_string(void *ptr)
 {
     // Specially handled by leak report code.
-    return ta_dbg_set_name(ptr, &allocation_is_string);
+    return ta_dbg_set_loc(ptr, &allocation_is_string);
 }
 
 #else

@@ -103,9 +103,6 @@ bool ta_vasprintf_append_buffer(char **str, const char *fmt, va_list ap) TA_PRF(
 #define ta_xrealloc(ta_parent, ptr, type, count) \
     (type *)ta_xrealloc_size(ta_parent, ptr, ta_calc_array_size(sizeof(type), count))
 
-// Generic pointer
-#define ta_oom_g(ptr) (TA_TYPEOF(ptr))ta_oom_p(ptr)
-
 // Can't be macros, because the OOM logic is slightly less trivial.
 char *ta_xstrdup(void *ta_parent, const char *str);
 char *ta_xstrndup(void *ta_parent, const char *str, size_t n);
@@ -113,19 +110,21 @@ void *ta_xsteal_(void *ta_parent, void *ptr);
 void *ta_xmemdup(void *ta_parent, void *ptr, size_t size);
 void *ta_xrealloc_size(void *ta_parent, void *ptr, size_t size);
 
-void *ta_oom_p(void *p);
-void ta_oom_b(bool b);
-char *ta_oom_s(char *s);
-
 #ifndef TA_NO_WRAPPERS
-#define ta_alloc_size(...) ta_dbg_set_name(ta_alloc_size(__VA_ARGS__), TA_LOC)
-#define ta_zalloc_size(...) ta_dbg_set_name(ta_zalloc_size(__VA_ARGS__), TA_LOC)
-#define ta_realloc_size(...) ta_dbg_set_name(ta_realloc_size(__VA_ARGS__), TA_LOC)
-#define ta_memdup(...) ta_dbg_set_name(ta_memdup(__VA_ARGS__), TA_LOC)
+#define ta_alloc_size(...)      ta_dbg_set_loc(ta_alloc_size(__VA_ARGS__), TA_LOC)
+#define ta_zalloc_size(...)     ta_dbg_set_loc(ta_zalloc_size(__VA_ARGS__), TA_LOC)
+#define ta_realloc_size(...)    ta_dbg_set_loc(ta_realloc_size(__VA_ARGS__), TA_LOC)
+#define ta_memdup(...)          ta_dbg_set_loc(ta_memdup(__VA_ARGS__), TA_LOC)
 #endif
 
+void ta_oom_b(bool b);
+char *ta_oom_s(char *s);
+void *ta_oom_p(void *p);
+// Generic pointer
+#define ta_oom_g(ptr) (TA_TYPEOF(ptr))ta_oom_p(ptr)
+
 void ta_enable_leak_report(void);
-void *ta_dbg_set_name(void *ptr, const char *name);
+void *ta_dbg_set_loc(void *ptr, const char *name);
 void *ta_dbg_mark_as_string(void *ptr);
 
 #endif

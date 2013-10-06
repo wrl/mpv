@@ -6,43 +6,43 @@
 // Note: all talloc wrappers are weird to the "x" functions, which abort on OOM.
 //       libtalloc doesn't do that, but the mplayer2 talloc copy of it did.
 
-#define talloc ta_xnew
-#define talloc_zero ta_xznew
+#define talloc                          ta_xnew
+#define talloc_zero                     ta_xznew
 
-#define talloc_array ta_xnew_array
-#define talloc_zero_array ta_xznew_array
+#define talloc_array                    ta_xnew_array
+#define talloc_zero_array               ta_xznew_array
 
-#define talloc_array_size ta_xnew_array_size
-#define talloc_realloc ta_xrealloc
-#define talloc_ptrtype ta_xnew_ptrtype
-#define talloc_array_ptrtype ta_xnew_array_ptrtype
+#define talloc_array_size               ta_xnew_array_size
+#define talloc_realloc                  ta_xrealloc
+#define talloc_ptrtype                  ta_xnew_ptrtype
+#define talloc_array_ptrtype            ta_xnew_array_ptrtype
 
-#define talloc_steal ta_xsteal
-#define talloc_realloc_size ta_xrealloc_size
-#define talloc_new ta_xnew_context
-#define talloc_set_destructor ta_xset_destructor
-#define talloc_parent ta_find_parent
-#define talloc_enable_leak_report ta_enable_leak_report
-#define talloc_size ta_xalloc_size
-#define talloc_zero_size ta_xzalloc_size
-#define talloc_get_size ta_get_size
-#define talloc_free_children ta_free_children
-#define talloc_free ta_free
-#define talloc_memdup ta_xmemdup
-#define talloc_strdup ta_xstrdup
-#define talloc_strndup ta_xstrndup
-#define talloc_asprintf ta_xasprintf
-#define talloc_vasprintf ta_xvasprintf
+#define talloc_steal                    ta_xsteal
+#define talloc_realloc_size             ta_xrealloc_size
+#define talloc_new                      ta_xnew_context
+#define talloc_set_destructor           ta_xset_destructor
+#define talloc_parent                   ta_find_parent
+#define talloc_enable_leak_report       ta_enable_leak_report
+#define talloc_size                     ta_xalloc_size
+#define talloc_zero_size                ta_xzalloc_size
+#define talloc_get_size                 ta_get_size
+#define talloc_free_children            ta_free_children
+#define talloc_free                     ta_free
+#define talloc_memdup                   ta_xmemdup
+#define talloc_strdup                   ta_xstrdup
+#define talloc_strndup                  ta_xstrndup
+#define talloc_asprintf                 ta_xasprintf
+#define talloc_vasprintf                ta_xvasprintf
 
 // Don't define linker-level symbols, as that would clash with real libtalloc.
-#define talloc_strdup_append ta_talloc_strdup_append
-#define talloc_strdup_append_buffer ta_talloc_strdup_append_buffer
-#define talloc_strndup_append ta_talloc_strndup_append
-#define talloc_strndup_append_buffer ta_talloc_strndup_append_buffer
-#define talloc_vasprintf_append ta_talloc_vasprintf_append
-#define talloc_vasprintf_append_buffer ta_talloc_vasprintf_append_buffer
-#define talloc_asprintf_append ta_talloc_asprintf_append
-#define talloc_asprintf_append_buffer ta_talloc_asprintf_append_buffer
+#define talloc_strdup_append            ta_talloc_strdup_append
+#define talloc_strdup_append_buffer     ta_talloc_strdup_append_buffer
+#define talloc_strndup_append           ta_talloc_strndup_append
+#define talloc_strndup_append_buffer    ta_talloc_strndup_append_buffer
+#define talloc_vasprintf_append         ta_talloc_vasprintf_append
+#define talloc_vasprintf_append_buffer  ta_talloc_vasprintf_append_buffer
+#define talloc_asprintf_append          ta_talloc_asprintf_append
+#define talloc_asprintf_append_buffer   ta_talloc_asprintf_append_buffer
 
 char *ta_talloc_strdup(void *t, const char *p);
 char *ta_talloc_strdup_append(char *s, const char *a);
