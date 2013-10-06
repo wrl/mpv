@@ -367,9 +367,9 @@ static void print_leak_report(void)
                     snprintf(name, sizeof(name), "%s", cur->name);
                 if (cur->name == &allocation_is_string) {
                     snprintf(name, sizeof(name), "'%.*s'",
-                             cur->size, (char *)PTR_FROM_HEADER(cur));
+                             (int)cur->size, (char *)PTR_FROM_HEADER(cur));
                 }
-                fprintf(stderr, "  %p %d %s(%d) %s\n", cur, cur->size,
+                fprintf(stderr, "  %p %zu %s(%zu) %s\n", cur, cur->size,
                         cur->ext ? "+ " : "", c_size, name);
             }
             size += cur->size;
@@ -378,7 +378,7 @@ static void print_leak_report(void)
             cur->leak_prev->leak_next = cur->leak_next;
             cur->leak_next = cur->leak_prev = NULL;
         }
-        fprintf(stderr, "%d bytes.\n", size);
+        fprintf(stderr, "%zu bytes.\n", size);
     }
     pthread_mutex_unlock(&ta_dbg_mutex);
 }
