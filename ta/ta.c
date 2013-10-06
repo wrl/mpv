@@ -356,29 +356,37 @@ static void print_leak_report(void)
     pthread_mutex_lock(&ta_dbg_mutex);
     if (leak_node.leak_next && leak_node.leak_next != &leak_node) {
         size_t size = 0;
+        size_t num_blocks = 0;
         fprintf(stderr, "Blocks not freed:\n");
+        fprintf(stderr, "  %-20s %10s %10s  %s\n",
+                "Ptr", "Bytes", "C. Bytes", "Name");
         while (leak_node.leak_next != &leak_node) {
             struct ta_header *cur = leak_node.leak_next;
             // Don't list those with parent; logically, only parents are listed
             if (!cur->next) {
                 size_t c_size = get_children_size(cur);
-                char name[80] = "";
+                char name[30] = {0};
                 if (cur->name)
                     snprintf(name, sizeof(name), "%s", cur->name);
                 if (cur->name == &allocation_is_string) {
                     snprintf(name, sizeof(name), "'%.*s'",
                              (int)cur->size, (char *)PTR_FROM_HEADER(cur));
                 }
-                fprintf(stderr, "  %p %zu %s(%zu) %s\n", cur, cur->size,
-                        cur->ext ? "+ " : "", c_size, name);
+                for (int n = 0; n < sizeof(name); n++) {
+                    if (name[n] && name[n] < 0x20)
+                        name[n] = '.';
+                }
+                fprintf(stderr, "  %-20p %10zu %10zu  %s\n",
+                        cur, cur->size, c_size, name);
             }
             size += cur->size;
+            num_blocks += 1;
             // Unlink, and don't confuse valgrind by leaving live pointers.
             cur->leak_next->leak_prev = cur->leak_prev;
             cur->leak_prev->leak_next = cur->leak_next;
             cur->leak_next = cur->leak_prev = NULL;
         }
-        fprintf(stderr, "%zu bytes.\n", size);
+        fprintf(stderr, "%zu bytes in %zu blocks.\n", size, num_blocks);
     }
     pthread_mutex_unlock(&ta_dbg_mutex);
 }
